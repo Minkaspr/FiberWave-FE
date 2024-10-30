@@ -25,3 +25,18 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+## Comands
+
+- --inline-template: Permite incluir el código HTML del componente directamente en el archivo TypeScript del componente.
+
+- --inline-style: Permite incluir los estilos CSS del componente directamente en el archivo TypeScript del componente.
+
+- --skip-tests: Evita la generación del archivo de pruebas (spec) para el componente.
+
+- --routing: Añade un archivo de enrutamiento al crear un nuevo módulo.
+
+ng g c nombre-del-componente --skip-tests
+
+ng generate c nombre-del-componente --inline-template --inline-style --skip-tests

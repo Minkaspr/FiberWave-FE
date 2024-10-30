@@ -1,0 +1,156 @@
+<section class="bg-gray-50 dark:bg-gray-900">
+  <div class="flex flex-col items-center justify-center px-4 py-8 mx-auto max-w-2xl h-full">
+    <div class="w-full bg-white rounded-lg shadow p-6 space-y-4">
+      <h2 class="mb-4 text-xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+        Regístrate en FiberWave
+      </h2>
+      <form [formGroup]="registerForm" novalidate="" (submit)="onSubmit()">
+        <div class="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
+          <div class="w-full required-field">
+            <label for="surname" [ngClass]="{
+                'default-label': !hasErrors('surname') && !hasSuccess('surname'),
+                'error-label': hasErrors('surname'),
+                'success-label': hasSuccess('surname')
+              }">
+              Nombres
+            </label>
+            <input formControlName="surname" type="text" name="surname" id="surname" placeholder="Ingresa tus nombres"
+              [ngClass]="{
+                'default-input': !hasErrors('surname') && !hasSuccess('surname'),
+                'error-input': hasErrors('surname'),
+                'success-input': hasSuccess('surname')
+              }">
+            <p [ngClass]="{
+                  'default-helper-text': !hasErrors('surname') && !hasSuccess('surname'),
+                  'error-helper-text': hasErrors('surname'),
+                  'success-helper-text': hasSuccess('surname')
+                  }">
+              Solo letras, 3-128 caracteres.
+            </p>
+          </div>
+          <div class="w-full required-field">
+            <label for="lastname" [ngClass]="{
+              'default-label': !hasErrors('lastname') && !hasSuccess('lastname'),
+              'error-label': hasErrors('lastname'),
+              'success-label': hasSuccess('lastname')
+            }">
+              Apellidos
+            </label>
+            <input formControlName="lastname" type="text" name="lastname" id="lastname"
+              placeholder="Ingresa tus apellidos" [ngClass]="{
+              'default-input': !hasErrors('lastname') && !hasSuccess('lastname'),
+              'error-input': hasErrors('lastname'),
+              'success-input': hasSuccess('lastname')
+            }">
+            <p [ngClass]="{
+                  'default-helper-text': !hasErrors('lastname') && !hasSuccess('lastname'),
+                  'error-helper-text': hasErrors('lastname'),
+                  'success-helper-text': hasSuccess('lastname')
+                  }">
+              Solo letras, 3-128 caracteres.
+            </p>
+          </div>
+          <div class="sm:col-span-2 required-field">
+            <label for="email" [ngClass]="{
+              'default-label': !hasErrors('email') && !hasSuccess('email'),
+              'error-label': hasErrors('email'),
+              'success-label': hasSuccess('email')
+            }">
+              Tu correo electrónico
+            </label>
+            <input formControlName="email" type="email" name="email" id="email" placeholder="nombre@empresa.com"
+              [ngClass]="{
+              'default-input': !hasErrors('email') && !hasSuccess('email'),
+              'error-input': hasErrors('email'),
+              'success-input': hasSuccess('email')
+            }">
+            <p [ngClass]="{
+                  'default-helper-text': !hasErrors('email') && !hasSuccess('email'),
+                  'error-helper-text': hasErrors('email'),
+                  'success-helper-text': hasSuccess('email')
+                  }">
+              Correo válido.
+            </p>
+          </div>
+          <div class="w-full required-field">
+            <label for="password" [ngClass]="{
+              'default-label': !hasErrors('password') && !hasSuccess('password'),
+              'error-label': hasErrors('password'),
+              'success-label': hasSuccess('password')
+            }">
+              Contraseña
+            </label>
+            <input formControlName="password" type="password" name="password" id="password" placeholder="••••••••"
+              [ngClass]="{
+              'default-input': !hasErrors('password') && !hasSuccess('password'),
+              'error-input': hasErrors('password'),
+              'success-input': hasSuccess('password')
+            }">
+            <p [ngClass]="{
+              'default-helper-text': !hasErrors('password') && !hasSuccess('password'),
+              'error-helper-text': hasErrors('password'),
+              'success-helper-text': hasSuccess('password')
+              }">
+              6+ caracteres, al menos una mayúscula, una minúscula, un número y un símbolo.
+            </p>
+          </div>
+          <div class="w-full required-field">
+            <label for="confirm-password" [ngClass]="{
+              'default-label': !hasErrors('confirmPassword') && !hasSuccess('confirmPassword'),
+              'error-label': hasErrors('confirmPassword'),
+              'success-label': hasSuccess('confirmPassword')
+            }">
+              Confirma tu contraseña
+            </label>
+            <input formControlName="confirmPassword" type="password" name="confirm-password" id="confirm-password"
+              placeholder="••••••••" [ngClass]="{
+              'default-input': !hasErrors('confirmPassword') && !hasSuccess('confirmPassword'),
+              'error-input': hasErrors('confirmPassword'),
+              'success-input': hasSuccess('confirmPassword')
+            }">
+            <p [ngClass]="{
+              'default-helper-text': !hasErrors('confirmPassword') && !hasSuccess('confirmPassword'),
+              'error-helper-text': hasErrors('confirmPassword'),
+              'success-helper-text': hasSuccess('confirmPassword')
+              }">
+              Debe coincidir con la contraseña.
+            </p>
+          </div>
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input formControlName="terms" aria-describedby="terms" type="checkbox" id="terms"
+                data-tooltip-target="terms-tooltip-bottom" data-tooltip-placement="bottom"
+                class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800">
+              <div id="terms-tooltip-bottom" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-red-900 bg-red-100 border border-red-200 rounded-lg shadow-sm opacity-0 tooltip">
+                Debes aceptar
+                <div class="tooltip-arrow" data-popper-arrow></div>
+              </div>
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="terms" class="font-light text-gray-500 dark:text-gray-300">
+                Acepto los
+                <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" href="">
+                  Términos y Condiciones
+                </a>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-center space-x-4">
+          <button type="submit"
+            class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            Crear una cuenta
+          </button>
+        </div>
+        <p class="text-sm font-light text-gray-500 dark:text-gray-400 text-center mt-4">
+          ¿Ya tienes una cuenta? 
+          <a routerLink="/auth/login"
+            class="font-medium text-primary-600 hover:underline dark:text-primary-500">
+            Inicia sesión aquí
+          </a>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
