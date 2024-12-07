@@ -124,9 +124,9 @@ Para conocer más sobre el proyecto y su desarrollo, consulta la [documentación
 Angular CLI incluye comandos para generar componentes, directivas, servicios y más. Algunos ejemplos son:
 
 ### Generar un componente:
-bash
-Copiar código
+```bash
 ng generate component nombre-del-componente
+```
 ### Otros comandos disponibles:
 - Directiva: `ng generate directive nombre-de-la-directiva`
 - Pipe: `ng generate pipe nombre-del-pipe`
