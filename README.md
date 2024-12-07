@@ -107,10 +107,10 @@ El proyecto utiliza dos configuraciones de entorno en el directorio `src/environ
 
 ### Levantar el Servidor de Desarrollo
 Para iniciar el servidor de Angular, ejecuta el siguiente comando:
-    ```bash
-      ng serve -o
-    ```
-    Esto abrirá automáticamente la aplicación en tu navegador predeterminado en http://localhost:4200.
+```bash
+  ng serve -o
+```
+  Esto abrirá automáticamente la aplicación en tu navegador predeterminado en http://localhost:4200.
 
 ---
 
