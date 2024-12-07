@@ -1,7 +1,7 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms'
 
 export class RegisterValidators {
-  static surnameValidator(): ValidatorFn {
+  static firstnameValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value;
       const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
@@ -72,7 +72,7 @@ export class RegisterValidators {
 
       const validations = [
         { condition: !value, error: { 'required': true } },
-        { condition: value?.length < 6, error: { 'length': true } },
+        { condition: value?.length < 8, error: { 'length': true } },
         { condition: !regex.test(value), error: { 'pattern': true } }
       ];
   

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { initFlowbite } from 'flowbite';
+import { ApiConfigService } from './services/api-config.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -9,18 +11,14 @@ import { initFlowbite } from 'flowbite';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private apiConfigService: ApiConfigService, private http: HttpClient) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const fragment = this.router.url.split('#')[1];
         if (fragment) {
           this.scrollToSection(fragment);
-          /*const element = document.getElementById(fragment);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }*/
         } else {
           window.scrollTo({ top: 0 });
         }
@@ -30,6 +28,7 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     initFlowbite();
+    this.checkApiHealth();
   }
 
   scrollToSection(sectionId: string): void {
@@ -41,5 +40,16 @@ export class AppComponent implements OnInit{
       top: offsetPosition,
       behavior: 'smooth'
     });
-  } 
+  }
+
+  checkApiHealth(): void {
+    this.apiConfigService.checkHealth().subscribe(
+      response => {
+        console.log('API Health Check:', response.message);
+      },
+      error => {
+        console.error('API Health Check failed:', error);
+      }
+    );
+  }
 }

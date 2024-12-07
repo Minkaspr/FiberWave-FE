@@ -7,23 +7,23 @@
       <form [formGroup]="registerForm" novalidate="" (submit)="onSubmit()">
         <div class="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
           <div class="w-full required-field">
-            <label for="surname" [ngClass]="{
-                'default-label': !hasErrors('surname') && !hasSuccess('surname'),
-                'error-label': hasErrors('surname'),
-                'success-label': hasSuccess('surname')
+            <label for="firstname" [ngClass]="{
+                'default-label': !hasErrors('firstname') && !hasSuccess('firstname'),
+                'error-label': hasErrors('firstname'),
+                'success-label': hasSuccess('firstname')
               }">
               Nombres
             </label>
-            <input formControlName="surname" type="text" name="surname" id="surname" placeholder="Ingresa tus nombres"
+            <input formControlName="firstname" type="text" name="firstname" id="firstname" placeholder="Ingresa tus nombres"
               [ngClass]="{
-                'default-input': !hasErrors('surname') && !hasSuccess('surname'),
-                'error-input': hasErrors('surname'),
-                'success-input': hasSuccess('surname')
+                'default-input': !hasErrors('firstname') && !hasSuccess('firstname'),
+                'error-input': hasErrors('firstname'),
+                'success-input': hasSuccess('firstname')
               }">
             <p [ngClass]="{
-                  'default-helper-text': !hasErrors('surname') && !hasSuccess('surname'),
-                  'error-helper-text': hasErrors('surname'),
-                  'success-helper-text': hasSuccess('surname')
+                  'default-helper-text': !hasErrors('firstname') && !hasSuccess('firstname'),
+                  'error-helper-text': hasErrors('firstname'),
+                  'success-helper-text': hasSuccess('firstname')
                   }">
               Solo letras, 3-128 caracteres.
             </p>
@@ -65,11 +65,15 @@
               'success-input': hasSuccess('email')
             }">
             <p [ngClass]="{
-                  'default-helper-text': !hasErrors('email') && !hasSuccess('email'),
-                  'error-helper-text': hasErrors('email'),
-                  'success-helper-text': hasSuccess('email')
-                  }">
-              Correo válido.
+              'default-helper-text': !hasErrors('email') && !hasSuccess('email'),
+              'error-helper-text': hasErrors('email'),
+              'success-helper-text': hasSuccess('email')
+              }">
+              @if (registerForm.get('email')?.errors?.['serverError']) {
+                {{ registerForm.get('email')?.errors?.['serverError'] }}
+              } @else {
+                {{ emailMsg }}
+              }
             </p>
           </div>
           <div class="w-full required-field">
@@ -91,7 +95,7 @@
               'error-helper-text': hasErrors('password'),
               'success-helper-text': hasSuccess('password')
               }">
-              6+ caracteres, al menos una mayúscula, una minúscula, un número y un símbolo.
+              8+ caracteres, al menos una mayúscula, una minúscula, un número y un símbolo.
             </p>
           </div>
           <div class="w-full required-field">
