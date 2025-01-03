@@ -37,6 +37,9 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     initFlowbite();
     this.initializeTooltip();
+    this.registerForm.get('password')?.valueChanges.subscribe(() => {
+      this.registerForm.get('confirmPassword')?.updateValueAndValidity();
+    });
   }
 
   createValidatorRegisterForm(): FormGroup {

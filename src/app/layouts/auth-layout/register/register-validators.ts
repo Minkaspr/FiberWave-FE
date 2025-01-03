@@ -4,7 +4,8 @@ export class RegisterValidators {
   static firstnameValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value;
-      const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+      //const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+      const regex = /^[\p{L}]+(?:\s[\p{L}]+)*$/u;
 
       const validations = [
         { condition: !value, error: { 'required': true } },
@@ -26,7 +27,7 @@ export class RegisterValidators {
   static lastnameValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value;
-      const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+      const regex = /^[\p{L}]+(?:\s[\p{L}]+)*$/u;
 
       const validations = [
         { condition: !value, error: { 'required': true } },
@@ -34,7 +35,7 @@ export class RegisterValidators {
         { condition: value?.startsWith(' ') || value?.endsWith(' '), error: { 'whitespace': true } },
         { condition: !regex.test(value), error: { 'pattern': true } }
       ];
-  
+
       for (const validation of validations) {
         if (validation.condition) {
           return validation.error;
@@ -54,7 +55,7 @@ export class RegisterValidators {
         { condition: !value, error: { 'required': true } },
         { condition: !regex.test(value), error: { 'pattern': true } }
       ];
-  
+
       for (const validation of validations) {
         if (validation.condition) {
           return validation.error;
@@ -68,14 +69,14 @@ export class RegisterValidators {
   static passwordValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value;
-      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
       const validations = [
         { condition: !value, error: { 'required': true } },
         { condition: value?.length < 8, error: { 'length': true } },
         { condition: !regex.test(value), error: { 'pattern': true } }
       ];
-  
+
       for (const validation of validations) {
         if (validation.condition) {
           return validation.error;
@@ -86,21 +87,16 @@ export class RegisterValidators {
     };
   }
 
-  static confirmPasswordValidator(password: string): ValidatorFn {
+  static confirmPasswordValidator(passwordFieldName: string): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
-      const passwordControl = control.root.get(password);
+      const formGroup = control.parent; 
+      if (!formGroup) return null;
 
-      const validations = [
-        { condition: passwordControl && control.value !== passwordControl.value, error: { 'passwordMismatch': true } }
-      ];
-  
-      for (const validation of validations) {
-        if (validation.condition) {
-          return validation.error;
-        }
-      }
+      const passwordControl = formGroup.get(passwordFieldName);
+      if (!passwordControl) return null;
 
-      return null;
+      const isMismatch = control.value !== passwordControl.value;
+      return isMismatch ? { passwordMismatch: true } : null;
     };
   }
 }
