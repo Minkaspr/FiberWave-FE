@@ -43,13 +43,20 @@ export class AppComponent implements OnInit {
   }
 
   checkApiHealth(): void {
-    this.apiConfigService.checkHealth().subscribe(
-      response => {
+    this.apiConfigService.checkHealth().subscribe({
+      next: (response) => {
         console.log('API Health Check:', response.message);
       },
-      error => {
-        console.error('API Health Check failed:', error);
+      error: (error) => {
+        if (error.status === 0) {
+          console.warn('El servidor no está disponible. Verifica si está activo.');
+        } else {
+          console.error('Error en el Health Check:', error.message);
+        }
+      },
+      complete: () => {
+        //console.log('Health Check completado.');
       }
-    );
+    });
   }
 }

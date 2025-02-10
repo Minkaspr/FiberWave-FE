@@ -15,3 +15,11 @@ export interface ApiResponse<T> {
   token?: string;
   refreshToken?: string;
 }
+
+export interface ProcessStatus<T = null> {
+  status: 'idle' | 'loading' | 'success' | 'error'; // Estados posibles
+  message: string; // Mensaje general opcional
+  statusCode?: number; // Código HTTP opcional
+  data?: T; // Datos en caso de éxito (opcional)
+  errors?: ApiError[]; // Errores en caso de fallo
+}

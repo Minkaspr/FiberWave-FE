@@ -44,13 +44,12 @@ export class UsersSelComponent implements OnInit {
   subscribeToDataUpdates(): void {
     this.usersDataService.users$.subscribe({
       next: (data) => {
-        this.users = this.transformUserDates(data); // Aquí transformas los datos si es necesario
-        this.cdRef.detectChanges(); // Detecta cambios manualmente si es necesario
+        this.users = this.transformUserDates(data); 
+        this.cdRef.detectChanges();
         console.log('Usuarios actualizados:', this.users);
       },
       error: (error) => {
         console.error('Error al obtener usuarios:', error);
-
       }
     });
     this.usersDataService.currentPage$.subscribe((page) => (this.currentPage = page));
@@ -67,7 +66,7 @@ export class UsersSelComponent implements OnInit {
       next: (errorMsg) => {
         this.errorMessage = errorMsg;
         if (errorMsg) {
-          console.error('Error recibido:', errorMsg);
+          //console.error('Error recibido:', errorMsg);
         }
       },
     });

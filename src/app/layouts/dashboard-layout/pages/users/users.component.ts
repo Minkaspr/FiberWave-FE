@@ -16,30 +16,30 @@ import { ReactiveFormsModule } from '@angular/forms';
   selector: 'app-users',
   standalone: true,
   imports: [
-    ReactiveFormsModule, 
-    UsersSelComponent, 
-    UsersInsComponent, 
-    UsersUpdComponent, 
-    UsersDetComponent, 
-    UsersDelComponent, 
+    ReactiveFormsModule,
+    UsersSelComponent,
+    UsersInsComponent,
+    UsersUpdComponent,
+    UsersDetComponent,
+    UsersDelComponent,
     UsersLkpComponent
   ],
   template: `
-    <section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased h-full">
-      <div class="mx-auto max-w-screen-xl px-4 lg:px-12">
+    <section class="relative bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased h-full">
+      <div class="mx-auto max-w-screen-xl px-4 lg:px-7">
         <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
-          <div class="flex flex-col px-4 pt-3 pb-1 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
+          <div class="flex flex-row px-4 pt-3 pb-1 space-y-3 items-center justify-between lg:space-y-0 lg:space-x-4">
             <div class="flex items-center flex-1 space-x-4">
               <h5 class="mr-3 font-semibold dark:text-white text-xl">Gestionar Usuarios</h5>
             </div>
-            <div class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
+            <div class="flex flex-row flex-shrink-0 gap-2">
               <button type="button" class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-              <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="w-4 h-4 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
-                  Sincronizar 1/250
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="w-4 h-4 sm:mr-2 icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+                <span class="hidden sm:block">Sincronizar 1/250</span>
               </button>
               <button type="button" class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-              <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="w-4 h-4 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-upload"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
-                  Export
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="w-4 h-4 sm:mr-2 icon icon-tabler icons-tabler-outline icon-tabler-upload"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                <span class="hidden sm:block">Export</span>
               </button>
             </div>
           </div>
@@ -147,23 +147,16 @@ import { ReactiveFormsModule } from '@angular/forms';
               </div>
             </div>
             <div
-              class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-              <button type="button" id="createProductModalButton" data-modal-target="createProductModal"
-                data-modal-toggle="createProductModal"
-                class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
-                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="h-5 w-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
-                Añadir Usuario
-              </button>
+              class="flex flex-row w-full justify-end md:w-auto space-y-2 md:space-y-0 items-stretch md:items-center md:space-x-3 flex-shrink-0">
+              <app-users-ins/>
             </div>
           </div>
           <app-users-sel/>
         </div>
       </div>
+      
     </section>
-    <app-users-ins/>
-    <app-users-upd/>
-    <app-users-det/>
-    <app-users-del/>
+    
   `,
   styles: ``
 })
@@ -209,7 +202,7 @@ export class UsersComponent implements OnInit {
   private setRoles(): void {
     const rolesGroup = this.filterForm.get('roles') as FormGroup;
     this.roles.forEach(role => {
-      rolesGroup.addControl(role.name, this.fb.control(false)); 
+      rolesGroup.addControl(role.name, this.fb.control(false));
     });
   }
 

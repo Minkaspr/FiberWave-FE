@@ -12,8 +12,9 @@ import { DashboardSidebarComponent } from "./components/dashboard-sidebar/dashbo
     <div class="antialiased bg-gray-50 dark:bg-gray-900">
       <app-dashboard-header/>
       <app-dashboard-sidebar/>
-      <main class="p-4 md:ml-64 min-h-screen pt-20">
+      <main class="p-4 lg:ml-64 min-h-screen pt-20">
         <router-outlet/>
+        
       </main>
     </div>
   `,

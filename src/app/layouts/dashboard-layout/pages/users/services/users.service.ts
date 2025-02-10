@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../../../../../models/response.model';
 import { User } from '../../../../../models/user.model';
 import { FiltersResponse } from '../../../../../models/user-filter.model';
+import { Admin } from '../../../../../models/admin.model';
+import { Customer } from '../../../../../models/customer.model';
+import { Seller } from '../../../../../models/seller.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +30,7 @@ export class UsersService {
     totalPages: number
   }>> {
     let queryParams = `currentPage=${currentPage}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
-    
+
     // Filtros opcionales
     if (roles.length > 0) {
       queryParams += `&roles=${roles.join(',')}`;
@@ -57,8 +60,18 @@ export class UsersService {
   }
 
   // Crear un nuevo usuario
-  createUser(userData: User): Observable<ApiResponse<{ user: User }>> {
-    return this.apiConfigService.post<ApiResponse<{ user: User }>>('user/create', userData);
+  createUserWithRole<T extends Admin | Seller | Customer>(
+    userData: User,
+    roleData: T
+  ): Observable<ApiResponse<{ user: User; role: T }>> {
+    // La ruta es única para todos los roles
+    const endpoint = 'user/create';
+    const payload = { userData, roleData };
+    console.log('Datos enviados al servidor:', JSON.stringify({ userData, roleData }, null, 2));
+    return this.apiConfigService.post<ApiResponse<{ user: User; role: T }>>(
+      endpoint,
+      payload
+    );
   }
 
   // Actualizar un usuario

@@ -1,14 +1,25 @@
+<button type="button" (click)="openModal()"
+  class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="h-5 w-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-plus">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 5l0 14" />
+    <path d="M5 12l14 0" />
+  </svg>
+  Añadir
+</button>
 <div id="createProductModal" tabindex="-1" aria-hidden="true"
   class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
   <div class="relative p-4 w-full max-w-2xl max-h-full">
     <!-- Modal content -->
     <div class="relative flex flex-col p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5 min-h-[460px]">
       <!-- Modal header -->
-      <div class="flex-none flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+      <div
+        class="flex-none flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Registrar Usuario</h3>
-        <button type="button"
-          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-          data-modal-target="createProductModal" data-modal-toggle="createProductModal">
+        <button type="button" (click)="closeModal()"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
           <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
@@ -19,8 +30,12 @@
         </button>
       </div>
       <!--Modal Steps-->
-      <ol class="flex-none flex items-center justify-center mt-2 mb-4 w-full max-w-2xl text-center text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
-        <li class="flex shrink-0 items-center text-primary-700 dark:text-primary-500">
+      <ol
+        class="flex-none flex items-center justify-center mt-2 mb-4 w-full max-w-2xl text-center text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
+        <li class="flex shrink-0 items-center" [ngClass]="{
+            'text-primary-700 dark:text-primary-500': currentStep === 1, 
+            'text-primary-500 dark:text-primary-400': currentStep !== 1 && completedSteps[0]
+            }">
           <span class="flex items-center">
             <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
               height="24" fill="none" viewBox="0 0 24 24">
@@ -37,7 +52,10 @@
         </li>
 
         <li class="flex shrink-0 items-center">
-          <span class="inline-flex items-center" [ngClass]="{'text-primary-700 dark:text-primary-500': currentStep === 2}">
+          <span class="inline-flex items-center" [ngClass]="{
+              'text-primary-700 dark:text-primary-500': currentStep === 2, 
+              'text-primary-500 dark:text-primary-400': currentStep !== 2 && completedSteps[1]
+              }">
             <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
               height="24" fill="none" viewBox="0 0 24 24">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -53,7 +71,10 @@
         </li>
 
         <li class="flex shrink-0 items-center">
-          <span class="inline-flex items-center">
+          <span class="inline-flex items-center" [ngClass]="{
+            'text-primary-700 dark:text-primary-500': currentStep === 3, 
+            'text-primary-500 dark:text-primary-400': currentStep !== 3 && completedSteps[2]
+            }">
             <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
               height="24" fill="none" viewBox="0 0 24 24">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -65,7 +86,7 @@
       </ol>
 
       <!-- Modal body -->
-      <form [formGroup]="userForm" (submit)="onSubmit()" class="grow">
+      <form [formGroup]="userInsForm" (submit)="onSubmit()" class="grow">
         @if (currentStep === 1) {
         <div formGroupName="step1" class="grid gap-4 mb-4 sm:grid-cols-2">
           <div>
@@ -78,12 +99,13 @@
               [class.default-input]="!hasErrors('step1','firstname')" placeholder="Escribe tu nombre">
           </div>
           <div>
-            <label for="surname" [class.error-label]="hasErrors('step1','surname')"
-              [class.default-label]="!hasErrors('step1','surname')">
+            <label for="lastname" [class.error-label]="hasErrors('step1','lastname')"
+              [class.default-label]="!hasErrors('step1','lastname')">
               Apellido
             </label>
-            <input formControlName="surname" type="text" id="surname" [class.error-input]="hasErrors('step1','surname')"
-              [class.default-input]="!hasErrors('step1','surname')" placeholder="Escribe tu apellido">
+            <input formControlName="lastname" type="text" id="lastname"
+              [class.error-input]="hasErrors('step1','lastname')" [class.default-input]="!hasErrors('step1','lastname')"
+              placeholder="Escribe tu apellido">
           </div>
           <div>
             <label for="email" [class.error-label]="hasErrors('step1','email')"
@@ -91,7 +113,7 @@
               Correo
             </label>
             <input formControlName="email" type="email" id="email" [class.error-input]="hasErrors('step1','email')"
-              [class.default-input]="!hasErrors('step1','email')" placeholder="example@email.com">
+              [class.default-input]="!hasErrors('step1','email')" placeholder="ejemplo@correo.com">
           </div>
           <div>
             <label for="role" [class.error-label]="hasErrors('step1','role')"
@@ -109,7 +131,31 @@
           <div>
             <label for="password" [class.error-label]="hasErrors('step1','password')"
               [class.default-label]="!hasErrors('step1','password')">
-              Contraseña
+              <span>Contraseña</span>
+              <button data-tooltip-target="tooltip-click" data-tooltip-trigger="click">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="w-5 h-5 icon icon-tabler icons-tabler-outline icon-tabler-info-circle">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                  <path d="M12 9h.01" />
+                  <path d="M11 12h1v4h1" />
+                </svg>
+              </button>
+              <div id="tooltip-click" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 tooltip max-w-64 break-words text-pretty">
+                La contraseña debe tener:
+                <ul class="list-disc pl-5 mt-1">
+                  <li>Al menos <b>8 caracteres</b>.</li>
+                  <li>Al menos una <strong>letra mayúscula</strong>.</li>
+                  <li>Al menos una <strong>letra minúscula</strong>.</li>
+                  <li>Al menos un <strong>número</strong>.</li>
+                  <li>Al menos un <strong>símbolo especial</strong> (<code>&#64;</code>, <code>$</code>, <code>!</code>,
+                    <code>%</code>, <code>*</code>, <code>?</code>, <code>&amp;</code>).
+                  </li>
+                </ul>
+                <div class="tooltip-arrow" data-popper-arrow></div>
+              </div>
             </label>
             <input formControlName="password" type="password" name="password" id="password"
               [class.error-input]="hasErrors('step1','password')" [class.default-input]="!hasErrors('step1','password')"
@@ -130,224 +176,217 @@
         <div formGroupName="step2" class="grid gap-4 mb-4 sm:grid-cols-2">
           @switch (selectedRole) {
           @case ('admin') {
-            <div>
-              <label for="address" 
-                [class.default-label]="!hasErrors('step2','address')"
-                [class.error-label]="hasErrors('step2','address')"
-                >
-                Dirección
-              </label>
-              <input type="text" id="address" formControlName="address" 
-                [class.error-input]="hasErrors('step2','address')"
-                [class.default-input]="!hasErrors('step2','address')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="city" 
-                [class.default-label]="!hasErrors('step2','city')"
-                [class.error-label]="hasErrors('step2','city')"
-                >
-                Ciudad
-              </label>
-              <input type="text" id="city" formControlName="city" 
-                [class.error-input]="hasErrors('step2','city')"
-                [class.default-input]="!hasErrors('step2','city')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="department" 
-                [class.default-label]="!hasErrors('step2','department')"
-                [class.error-label]="hasErrors('step2','department')"
-                >
-                Departamento
-              </label>
-              <input type="text" id="department" formControlName="department" 
-                [class.error-input]="hasErrors('step2','department')"
-                [class.default-input]="!hasErrors('step2','department')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="gender" 
-                [class.default-label]="!hasErrors('step2','gender')"
-                [class.error-label]="hasErrors('step2','gender')"
-                >
-                Genero
-              </label>
-              <input type="text" id="gender" formControlName="gender" 
-                [class.error-input]="hasErrors('step2','gender')"
-                [class.default-input]="!hasErrors('step2','gender')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="birthDate" 
-                [class.default-label]="!hasErrors('step2','birthDate')"
-                [class.error-label]="hasErrors('step2','birthDate')"
-                >
-                Fecha Cumpleaños
-              </label>
-              <app-datepicker/>
-            </div>
-            <div>
-              <label for="identityDocument" 
-                [class.default-label]="!hasErrors('step2','identityDocument')"
-                [class.error-label]="hasErrors('step2','identityDocument')"
-                >
-                Documento de Identidad
-              </label>
-              <input type="text" id="identityDocument" formControlName="identityDocument" 
-                [class.error-input]="hasErrors('step2','identityDocument')"
-                [class.default-input]="!hasErrors('step2','identityDocument')" 
-                placeholder="Intoduce tu género">
-            </div>
+          <div>
+            <label for="address" [class.default-label]="!hasErrors('step2','address')"
+              [class.error-label]="hasErrors('step2','address')">
+              Dirección
+            </label>
+            <input type="text" id="address" formControlName="address" [class.error-input]="hasErrors('step2','address')"
+              [class.default-input]="!hasErrors('step2','address')" placeholder="Intoduce tu dirección">
+          </div>
+          <div>
+            <label for="city" [class.default-label]="!hasErrors('step2','city')"
+              [class.error-label]="hasErrors('step2','city')">
+              Ciudad
+            </label>
+            <input type="text" id="city" formControlName="city" [class.error-input]="hasErrors('step2','city')"
+              [class.default-input]="!hasErrors('step2','city')" placeholder="Intoduce tu ciudad">
+          </div>
+          <div>
+            <label for="department" [class.default-label]="!hasErrors('step2','department')"
+              [class.error-label]="hasErrors('step2','department')">
+              Departamento
+            </label>
+            <input type="text" id="department" formControlName="department"
+              [class.error-input]="hasErrors('step2','department')"
+              [class.default-input]="!hasErrors('step2','department')" placeholder="Intoduce tu departamento">
+          </div>
+          <div>
+            <label for="gender" [class.default-label]="!hasErrors('step2','gender')"
+              [class.error-label]="hasErrors('step2','gender')">
+              Género
+            </label>
+            <select id="gender" formControlName="gender" [class.error-input]="hasErrors('step2','gender')"
+              [class.default-input]="!hasErrors('step2','gender')">
+              <option value="" disabled selected>Introduce tu género</option>
+              <option value="male">Masculino</option>
+              <option value="female">Femenino</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label for="birth_date" [class.default-label]="!hasErrors('step2','birth_date')"
+              [class.error-label]="hasErrors('step2','birth_date')">
+              Fecha Nacimiento
+            </label>
+            <app-datepicker id="birth_date" formControlName="birth_date" [maxDate]="todayDate" />
+          </div>
+          <div>
+            <label for="identity_document" [class.default-label]="!hasErrors('step2','identity_document')"
+              [class.error-label]="hasErrors('step2','identity_document')">
+              Documento de Identidad
+            </label>
+            <input type="text" maxlength="20" id="identity_document" formControlName="identity_document"
+              [class.error-input]="hasErrors('step2','identity_document')"
+              [class.default-input]="!hasErrors('step2','identity_document')"
+              placeholder="Intoduce tu documento de identidad">
+          </div>
           }
           @case ('seller') {
-            <div>
-              <label for="address" 
-                [class.default-label]="!hasErrors('step2','address')"
-                [class.error-label]="hasErrors('step2','address')"
-                >
-                Direccion
-              </label>
-              <input type="text" id="address" formControlName="address" 
-                [class.error-input]="hasErrors('step2','address')"
-                [class.default-input]="!hasErrors('step2','address')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="reference" 
-                [class.default-label]="!hasErrors('step2','reference')"
-                [class.error-label]="hasErrors('step2','reference')"
-                >
-                Referencia
-              </label>
-              <input type="text" id="reference" formControlName="reference" 
-                [class.error-input]="hasErrors('step2','reference')"
-                [class.default-input]="!hasErrors('step2','reference')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="city" 
-                [class.default-label]="!hasErrors('step2','city')"
-                [class.error-label]="hasErrors('step2','city')"
-                >
-                Ciudad
-              </label>
-              <input type="text" id="city" formControlName="city" 
-                [class.error-input]="hasErrors('step2','city')"
-                [class.default-input]="!hasErrors('step2','city')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="department" 
-                [class.default-label]="!hasErrors('step2','department')"
-                [class.error-label]="hasErrors('step2','department')"
-                >
-                Departamento
-              </label>
-              <input type="text" id="department" formControlName="department" 
-                [class.error-input]="hasErrors('step2','department')"
-                [class.default-input]="!hasErrors('step2','department')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="nationality" 
-                [class.default-label]="!hasErrors('step2','nationality')"
-                [class.error-label]="hasErrors('step2','nationality')"
-                >
-                Nacionalidad
-              </label>
-              <input type="text" id="nationality" formControlName="nationality" 
-                [class.error-input]="hasErrors('step2','nationality')"
-                [class.default-input]="!hasErrors('step2','nationality')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="gender" 
-                [class.default-label]="!hasErrors('step2','gender')"
-                [class.error-label]="hasErrors('step2','gender')"
-                >
-                Genero
-              </label>
-              <input type="text" id="gender" formControlName="gender" 
-                [class.error-input]="hasErrors('step2','gender')"
-                [class.default-input]="!hasErrors('step2','gender')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="birthDate" 
-                [class.default-label]="!hasErrors('step2','birthDate')"
-                [class.error-label]="hasErrors('step2','birthDate')"
-                >
-                Fecha de Cumpleaños
-              </label>
-              <input type="text" id="birthDate" formControlName="birthDate" 
-                [class.error-input]="hasErrors('step2','birthDate')"
-                [class.default-input]="!hasErrors('step2','birthDate')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="identityDocument" 
-                [class.default-label]="!hasErrors('step2','identityDocument')"
-                [class.error-label]="hasErrors('step2','identityDocument')"
-                >
-                Documento de Identidad
-              </label>
-              <input type="text" id="identityDocument" formControlName="identityDocument" 
-                [class.error-input]="hasErrors('step2','identityDocument')"
-                [class.default-input]="!hasErrors('step2','identityDocument')" 
-                placeholder="Intoduce tu género">
-            </div>
+          <div>
+            <label for="address" [class.default-label]="!hasErrors('step2','address')"
+              [class.error-label]="hasErrors('step2','address')">
+              Direccion
+            </label>
+            <input type="text" id="address" formControlName="address" [class.error-input]="hasErrors('step2','address')"
+              [class.default-input]="!hasErrors('step2','address')" placeholder="Intoduce tu dirección">
+          </div>
+          <div>
+            <label for="reference" [class.default-label]="!hasErrors('step2','reference')"
+              [class.error-label]="hasErrors('step2','reference')">
+              Referencia
+            </label>
+            <input type="text" id="reference" formControlName="reference"
+              [class.error-input]="hasErrors('step2','reference')"
+              [class.default-input]="!hasErrors('step2','reference')" placeholder="Intoduce la referencia">
+          </div>
+          <div>
+            <label for="city" [class.default-label]="!hasErrors('step2','city')"
+              [class.error-label]="hasErrors('step2','city')">
+              Ciudad
+            </label>
+            <input type="text" id="city" formControlName="city" [class.error-input]="hasErrors('step2','city')"
+              [class.default-input]="!hasErrors('step2','city')" placeholder="Intoduce la ciudad">
+          </div>
+          <div>
+            <label for="department" [class.default-label]="!hasErrors('step2','department')"
+              [class.error-label]="hasErrors('step2','department')">
+              Departamento
+            </label>
+            <input type="text" id="department" formControlName="department"
+              [class.error-input]="hasErrors('step2','department')"
+              [class.default-input]="!hasErrors('step2','department')" placeholder="Intoduce el departamento">
+          </div>
+          <div>
+            <label for="nationality" [class.default-label]="!hasErrors('step2','nationality')"
+              [class.error-label]="hasErrors('step2','nationality')">
+              Nacionalidad
+            </label>
+            <input type="text" id="nationality" formControlName="nationality"
+              [class.error-input]="hasErrors('step2','nationality')"
+              [class.default-input]="!hasErrors('step2','nationality')" placeholder="Intoduce tu nacionalidad">
+          </div>
+          <div>
+            <label for="gender" [class.default-label]="!hasErrors('step2','gender')"
+              [class.error-label]="hasErrors('step2','gender')">
+              Genero
+            </label>
+            <select id="gender" formControlName="gender" [class.error-input]="hasErrors('step2','gender')"
+              [class.default-input]="!hasErrors('step2','gender')">
+              <option value="" disabled selected>Introduce tu género</option>
+              <option value="male">Masculino</option>
+              <option value="female">Femenino</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label for="birth_date" [class.default-label]="!hasErrors('step2','birth_date')"
+              [class.error-label]="hasErrors('step2','birth_date')">
+              Fecha de Nacimiento
+            </label>
+            <app-datepicker id="birth_date" formControlName="birth_date" [maxDate]="todayDate" />
+          </div>
+          <div>
+            <label for="identity_document" [class.default-label]="!hasErrors('step2','identity_document')"
+              [class.error-label]="hasErrors('step2','identity_document')">
+              Documento de Identidad
+            </label>
+            <input type="text" id="identity_document" formControlName="identity_document"
+              [class.error-input]="hasErrors('step2','identity_document')"
+              [class.default-input]="!hasErrors('step2','identity_document')"
+              placeholder="Intoduce tu documento de identidad">
+          </div>
           }
           @case ('customer') {
-            <div>
-              <label for="gender" 
-                [class.default-label]="!hasErrors('step2','gender')"
-                [class.error-label]="hasErrors('step2','gender')"
-                >
-                Género
-              </label>
-              <input type="text" id="gender" formControlName="gender" 
-                [class.error-input]="hasErrors('step2','gender')"
-                [class.default-input]="!hasErrors('step2','gender')" 
-                placeholder="Intoduce tu género">
-            </div>
-            <div>
-              <label for="birthDate"
-                [class.error-label]="hasErrors('step2','birthDate')"
-                [class.default-label]="!hasErrors('step2','birthDate')">
-                Fecha de Nacimiento
-              </label>
-              <input type="text" id="birthDate" formControlName="birthDate" 
-                [class.error-input]="hasErrors('step2','birthDate')"
-                [class.default-input]="!hasErrors('step2','birthDate')" 
-                placeholder="birthDate">
-            </div>
-            <div>
-              <label for="phoneNumber"
-                [class.error-label]="hasErrors('step2','phoneNumber')"
-                [class.default-label]="!hasErrors('step2','phoneNumber')">
-                Número de Telefono
-              </label>
-              <input type="text" id="phoneNumber" formControlName="phoneNumber" 
-                [class.error-input]="hasErrors('step2','phoneNumber')"
-                [class.default-input]="!hasErrors('step2','phoneNumber')" 
-                placeholder="phoneNumber">
-            </div>
-            <div>
-              <label for="loyaltyPoints"
-                [class.error-label]="hasErrors('step2','loyaltyPoints')"
-                [class.default-label]="!hasErrors('step2','loyaltyPoints')">
-                Puntos de Fidelidad
-              </label>
-              <input type="text" id="loyaltyPoints" formControlName="loyaltyPoints"
-                [class.error-input]="hasErrors('step2','loyaltyPoints')"
-                [class.default-input]="!hasErrors('step2','loyaltyPoints')" 
-                placeholder="loyaltyPoints">
-            </div>
+          <div>
+            <label for="gender" [class.default-label]="!hasErrors('step2','gender')"
+              [class.error-label]="hasErrors('step2','gender')">
+              Género
+            </label>
+            <select id="gender" formControlName="gender" [class.error-input]="hasErrors('step2','gender')"
+              [class.default-input]="!hasErrors('step2','gender')">
+              <option value="" disabled selected>Introduce tu género</option>
+              <option value="male">Masculino</option>
+              <option value="female">Femenino</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label for="birth_date" [class.error-label]="hasErrors('step2','birth_date')"
+              [class.default-label]="!hasErrors('step2','birth_date')">
+              Fecha de Nacimiento
+            </label>
+            <app-datepicker id="birth_date" formControlName="birth_date" [maxDate]="todayDate" orientation="bottom"/>
+          </div>
+          <div>
+            <label for="phone_number" [class.error-label]="hasErrors('step2','phone_number')"
+              [class.default-label]="!hasErrors('step2','phone_number')">
+              Número de Telefono
+            </label>
+            <input type="text" id="phone_number" formControlName="phone_number"
+              [class.error-input]="hasErrors('step2','phone_number')"
+              [class.default-input]="!hasErrors('step2','phone_number')" placeholder="Introduce tu número de telefono">
+          </div>
+          <div>
+            <label for="loyalty_points" [class.error-label]="hasErrors('step2','loyalty_points')"
+              [class.default-label]="!hasErrors('step2','loyalty_points')">
+              Puntos de Fidelidad
+            </label>
+            <input type="text" id="loyalty_points" formControlName="loyalty_points"
+              [class.error-input]="hasErrors('step2','loyalty_points')"
+              [class.default-input]="!hasErrors('step2','loyalty_points')" placeholder="Cantidad de puntos de fidelidad">
+          </div>
           }
           @default {
           Rol no definido
           }
+          }
+        </div>
+        } @else if (currentStep === 3) {
+        <div class="mb-8 flex flex-col gap-6">
+          @for (section of sectionsWithData; track $index) {
+          <div class="flex flex-col gap-4">
+            <h3 class="text-xl font-semibold text-primary">{{ section.title }}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              @for (field of section.fields; track $index) {
+              <div class="flex flex-col space-y-1">
+                <div class="flex items-center space-x-2 text-muted-foreground text-slate-600">
+                  <ng-container *ngComponentOutlet="getIconComponent(field.icon)"></ng-container>
+                  <span class="font-medium">{{ field.label }}</span>
+                </div>
+                <span class="text-lg font-semibold pl-7">
+                  @switch (field.label) {
+                  @case ('Fecha de Nacimiento') {
+                  {{ field.value | date: 'dd/MM/yyyy' }}
+                  }
+                  @case ('Rol') {
+                  {{ roleTranslations[field.value] || field.value }}
+                  }
+                  @case ('Género') {
+                  {{ genderTranslations[field.value] || field.value }}
+                  }
+                  @case ('Contraseña') {
+                  {{ maskPassword(field.value) }}
+                  }
+                  @default {
+                  {{ field.value }}
+                  }
+                  }
+                </span>
+              </div>
+              }
+            </div>
+          </div>
           }
         </div>
         }
@@ -362,20 +401,103 @@
         </button>
         <div class="flex">
           <button (click)="nextStep()"
-            class="font-medium text-white rounded-lg text-sm px-5 py-2.5  focus:outline-none " 
-            [ngClass]="{ 
-              ' bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800': isStepValid(), 
-              'bg-blue-400 dark:bg-blue-500 cursor-not-allowed': !isStepValid() }"
-            [style.display]="currentStep === 2 ? 'none' : 'block'">
+            class="font-medium text-white rounded-lg text-sm px-5 py-2.5  focus:outline-none " [ngClass]="{ 
+              'bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800': isStepValid(currentStep), 
+              'bg-blue-400 dark:bg-blue-500 cursor-not-allowed': !isStepValid(currentStep) }"
+            [style.display]="currentStep === 3 ? 'none' : 'block'">
             Siguiente
           </button>
-          <button [disabled]="!userForm.get('step2')?.valid"
+          <button [disabled]="!userInsForm.get('step2')?.valid" (click)="onSubmit()"
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            [class.hidden]="currentStep !== 2" [class.block]="currentStep === 2">
+            [class.hidden]="currentStep !== 3" [class.block]="currentStep === 3">
             Guardar
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="fixed top-2 right-2 flex flex-col gap-3">
+    <div id="toast-success"
+      class="hidden items-start w-full max-w-xs min-w-72 p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 transition-opacity duration-300 ease-out opacity-0"
+      role="alert">
+      <div
+        class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+          viewBox="0 0 20 20">
+          <path
+            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+        </svg>
+        <span class="sr-only">Check icon</span>
+      </div>
+      <div class="ms-3 text-sm font-normal">
+        <span class="toast-message">Item has been deleted.</span>
+        <ul class="toast-errors list-disc list-inside"></ul>
+      </div>
+      <button type="button"
+        class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+        data-dismiss-target="#toast-success" aria-label="Close">
+        <span class="sr-only">Close</span>
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+      </button>
+    </div>
+    <div id="toast-danger"
+      class="hidden items-start w-full max-w-xs min-w-72 p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 transition-opacity duration-300 ease-out opacity-0"
+      role="alert">
+      <div
+        class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+          viewBox="0 0 20 20">
+          <path
+            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
+        </svg>
+        <span class="sr-only">Error icon</span>
+      </div>
+      <div class="ms-3 text-sm font-normal">
+        <span class="toast-message">Item has been deleted.</span>
+        <ul class="toast-errors list-disc list-inside"></ul>
+      </div>
+      <button type="button"
+        class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+        data-dismiss-target="#toast-danger" aria-label="Close">
+        <span class="sr-only">Close</span>
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+      </button>
+    </div>
+    <div id="toast-warning"
+      class="hidden items-start w-full max-w-xs min-w-72 p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 transition-opacity duration-300 ease-out opacity-0"
+      role="alert">
+      <div
+        class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+          viewBox="0 0 20 20">
+          <path
+            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z" />
+        </svg>
+        <span class="sr-only">Warning icon</span>
+      </div>
+      <div class="ms-3 text-sm font-normal">
+        <span class="toast-message">
+          Item has been deleted.
+        </span>
+        <ul class="toast-errors list-disc list-inside"></ul>
+      </div>
+      <button type="button"
+        class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+        data-dismiss-target="#toast-warning" aria-label="Close">
+        <span class="sr-only">Close</span>
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+      </button>
     </div>
   </div>
 </div>

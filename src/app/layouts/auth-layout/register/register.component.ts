@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -6,7 +6,7 @@ import { RegisterValidators } from './register-validators';
 import { initFlowbite, Tooltip } from 'flowbite';
 import { AuthService } from '../services/auth-service.service';
 import { User } from '../../../models/user.model';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse, ApiError } from '../../../models/response.model';
 
 @Component({
@@ -27,9 +27,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     private FormBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthService,
-    private http: HttpClient,
-    private cdRef: ChangeDetectorRef
+    private authService: AuthService
   ) {
     this.registerForm = this.createValidatorRegisterForm();
   }

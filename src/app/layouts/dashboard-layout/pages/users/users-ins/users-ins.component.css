@@ -10,10 +10,10 @@
   }
 
   .default-label {
-    @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white;
+    @apply flex items-center gap-2 mb-2 text-sm font-medium text-gray-900 dark:text-white;
   }
 
   .error-label {
-    @apply block mb-2 text-sm font-medium text-red-700 dark:text-red-500;
+    @apply flex items-center gap-2 mb-2 text-sm font-medium text-red-700 dark:text-red-500;
   }
 }
