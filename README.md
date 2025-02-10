@@ -107,10 +107,10 @@ El proyecto utiliza dos configuraciones de entorno en el directorio `src/environ
 
 ### Levantar el Servidor de Desarrollo
 Para iniciar el servidor de Angular, ejecuta el siguiente comando:
-    ```bash
-      ng serve -o
-    ```
-    Esto abrirá automáticamente la aplicación en tu navegador predeterminado en http://localhost:4200.
+```bash
+  ng serve -o
+```
+  Esto abrirá automáticamente la aplicación en tu navegador predeterminado en http://localhost:4200.
 
 ---
 
@@ -124,9 +124,9 @@ Para conocer más sobre el proyecto y su desarrollo, consulta la [documentación
 Angular CLI incluye comandos para generar componentes, directivas, servicios y más. Algunos ejemplos son:
 
 ### Generar un componente:
-bash
-Copiar código
+```bash
 ng generate component nombre-del-componente
+```
 ### Otros comandos disponibles:
 - Directiva: `ng generate directive nombre-de-la-directiva`
 - Pipe: `ng generate pipe nombre-del-pipe`
