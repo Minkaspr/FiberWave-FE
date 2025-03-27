@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, ViewChild, forwardRef, Optional, Inject } from '@angular/core';
 import { Datepicker } from 'flowbite';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl, ControlContainer } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-datepicker',
@@ -31,7 +31,7 @@ export class DatepickerComponent implements AfterViewInit, ControlValueAccessor 
   private _value: string | null = null;
   private _lastErrorState: boolean = false;
 
-  constructor(@Optional() private controlContainer: ControlContainer) { }
+  constructor(@Optional() private controlContainer: ControlContainer, private datePipe: DatePipe) { }
 
   get control(): FormControl | null {
     const controlName = this.id; // Usa el `id` como el nombre del control
@@ -44,8 +44,20 @@ export class DatepickerComponent implements AfterViewInit, ControlValueAccessor 
 
   writeValue(value: string | null): void {
     this._value = value;
-    if (value) {
+    /* if (value) {
       this.setSelectedDate(value);
+    } */
+    if (value) {
+      // Convertir la fecha al formato esperado (dd/mm/yyyy)
+      const formattedDate = this.datePipe.transform(value, 'dd/MM/yyyy');
+      
+      if (formattedDate) {
+        this._value = formattedDate;
+        this.setSelectedDate(formattedDate);
+      }
+    } else {
+      this._value = null;
+      this.setSelectedDate('');
     }
   }
 
@@ -147,9 +159,9 @@ export class DatepickerComponent implements AfterViewInit, ControlValueAccessor 
     }
   }
 
-  getSelectedDate(): string | undefined {
+  /* getSelectedDate(): string | undefined {
     return this.datepickerInstance?.getDate() as string | undefined;
-  }
+  } */
 
   setSelectedDate(date: string): void {
     this.datepickerInstance?.setDate(date);
@@ -171,4 +183,29 @@ export class DatepickerComponent implements AfterViewInit, ControlValueAccessor 
       },
     };
   }
+
+  getSelectedDate(): string | undefined {
+    const date = this.datepickerInstance?.getDate(); // Puede ser string | Date | string[] | undefined
+  
+    if (!date) return undefined;
+  
+    if (Array.isArray(date)) {
+      console.error("Error: Datepicker devolvió un array inesperado", date);
+      return undefined;
+    }
+  
+    try {
+      // Si date es un string, intenta convertirlo a Date
+      const parsedDate = new Date(date);
+      if (!isNaN(parsedDate.getTime())) {
+        return this.datePipe.transform(parsedDate, 'yyyy-MM-dd') ?? undefined;
+      }
+    } catch (error) {
+      console.error("Error al parsear la fecha:", error);
+    }
+  
+    console.error("Error: Tipo de fecha desconocido", date);
+    return undefined;
+  }
+  
 }

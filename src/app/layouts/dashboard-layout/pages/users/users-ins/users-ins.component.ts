@@ -6,7 +6,7 @@ import type { ModalOptions, ModalInterface } from 'flowbite';
 import { DatepickerComponent } from "../components/datepicker/datepicker.component";
 import { ChangeDetectorRef } from '@angular/core';
 import { UserInsValidators } from './user-ins-validators';
-import { User } from '../../../../../models/user.model';
+import { User, UserWithRole } from '../../../../../models/user.model';
 import { UsersDataService } from '../services/users-data.service';
 import { UserIconComponent } from '../../../../../icons/user-icon/user-icon.component';
 import { CalendarIconComponent } from '../../../../../icons/calendar-icon/calendar-icon.component';
@@ -23,6 +23,9 @@ import { CoinsIconComponent } from '../../../../../icons/coins-icon/coins-icon.c
 import { GlobeIconComponent } from '../../../../../icons/globe-icon/globe-icon.component';
 import { LocationPinIconComponent } from '../../../../../icons/location-pin-icon/location-pin-icon.component';
 import { PhoneIconComponent } from '../../../../../icons/phone-icon/phone-icon.component';
+import { Admin } from '../../../../../models/admin.model';
+import { Customer } from '../../../../../models/customer.model';
+import { Seller } from '../../../../../models/seller.model';
 
 @Component({
   selector: 'app-users-ins',
@@ -287,17 +290,17 @@ export class UsersInsComponent implements OnInit, AfterViewInit {
 
     // Filtrar y mapear los datos en secciones
     const sections = Object.entries(sectionFieldMap)
-    .map(([title, fieldsEsperados]) => ({
-      title,
-      fields: fieldsEsperados
-        .filter((field) => selectedFields.includes(field)) // Solo incluir fields permitidos por el rol
-        .map((field) => ({
-          icon: fieldIconMap[field] || 'app-user-icon', // Icono por campo
-          label: this.getFieldLabel(field), // label amigable
-          value: combinedData[field] || 'N/A', // value del campo o 'N/A' si no existe
-        })),
-    }))
-    .filter(section => section.fields.length > 0);
+      .map(([title, fieldsEsperados]) => ({
+        title,
+        fields: fieldsEsperados
+          .filter((field) => selectedFields.includes(field)) // Solo incluir fields permitidos por el rol
+          .map((field) => ({
+            icon: fieldIconMap[field] || 'app-user-icon', // Icono por campo
+            label: this.getFieldLabel(field), // label amigable
+            value: combinedData[field] || 'N/A', // value del campo o 'N/A' si no existe
+          })),
+      }))
+      .filter(section => section.fields.length > 0);
 
     return sections;
   }
@@ -426,14 +429,14 @@ export class UsersInsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  generateFormJson(): { user: User;[key: string]: any } {
+  generateFormJson(): UserWithRole {
     const selectedFields = this.roleFieldMap[this.selectedRole] || [];
     const step1Data = this.userInsForm.get('step1')?.value || {};
     const step2Data = this.userInsForm.get('step2')?.value || {};
-
+  
     // Combinar los datos de todos los pasos
     const combinedData = { ...step1Data, ...step2Data };
-
+  
     // Filtrar solo los fields relevantes para el rol seleccionado
     const filteredData = selectedFields.reduce((result, field) => {
       if (combinedData[field] !== null && combinedData[field] !== undefined) {
@@ -441,32 +444,43 @@ export class UsersInsComponent implements OnInit, AfterViewInit {
       }
       return result;
     }, {} as { [key: string]: any });
-
+  
     // Separar los datos del usuario y del rol
-    const { firstname, lastname, email, role, password, is_active, ...roleData } = filteredData;
-
-    // console.log('Filtered Data:', filteredData);
-    // console.log('Role Data:', roleData);
-
-    // Retornar los datos estructurados
+    const { firstname, lastname, email, role, password, is_active, ...roleSpecificData } = filteredData;
+  
+    // Determinar el tipo específico de roleData según el rol seleccionado
+    let roleData: Admin | Customer | Seller | undefined;
+    switch (this.selectedRole) {
+      case 'admin':
+        roleData = roleSpecificData as Admin;
+        break;
+      case 'customer':
+        roleData = roleSpecificData as Customer;
+        break;
+      case 'seller':
+        roleData = roleSpecificData as Seller;
+        break;
+      default:
+        roleData = undefined;
+    }
+  
+    // Retornar los datos estructurados en el formato UserWithRole
     return {
-      user: {
+      userData: {
         firstname,
         lastname,
         email,
         password,
         role,
-        is_active: is_active !== undefined ? is_active : true, // value por defecto
+        is_active: is_active !== undefined ? is_active : true, // Valor por defecto
       },
-      roleData: { ...roleData }
+      roleData,
     };
   }
-
+  
   onSubmit() {
     if (this.userInsForm.valid) {
-      const { user, roleData } = this.generateFormJson();
-      //console.log('Datos enviados al servicio:', JSON.stringify({ user, roleData }, null, 2));
-      this.usersDataService.createUser(user, roleData);
+      this.usersDataService.createUser(this.generateFormJson());
     } else {
       console.log('Formulario no válido');
     }

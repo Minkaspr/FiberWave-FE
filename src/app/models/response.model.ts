@@ -16,7 +16,7 @@ export interface ApiResponse<T> {
   refreshToken?: string;
 }
 
-export interface ProcessStatus<T = null> {
+export interface ProcessStatus<T = undefined> {
   status: 'idle' | 'loading' | 'success' | 'error'; // Estados posibles
   message: string; // Mensaje general opcional
   statusCode?: number; // Código HTTP opcional

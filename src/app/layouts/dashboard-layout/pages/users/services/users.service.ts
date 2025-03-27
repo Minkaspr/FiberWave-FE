@@ -2,12 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { ApiConfigService } from '../../../../../services/api-config.service';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../../../../../models/response.model';
-import { User } from '../../../../../models/user.model';
+import { User, UserResponse, UsersResponse, UserWithRole } from '../../../../../models/user.model';
 import { FiltersResponse } from '../../../../../models/user-filter.model';
-import { Admin } from '../../../../../models/admin.model';
-import { Customer } from '../../../../../models/customer.model';
-import { Seller } from '../../../../../models/seller.model';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -16,37 +12,8 @@ export class UsersService {
   private apiConfigService = inject(ApiConfigService);
 
   // Obtener todos los usuarios
-  fetchUsers(
-    currentPage: number = 1,
-    pageSize: number = 10,
-    roles: string[] = [],
-    isActive: boolean | null = null,
-    searchTerm: string | null = null,
-    sortBy: string = 'created_at',
-    sortOrder: string = 'desc'
-  ): Observable<ApiResponse<{
-    users: User[],
-    totalItems: number,
-    totalPages: number
-  }>> {
-    let queryParams = `currentPage=${currentPage}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
-
-    // Filtros opcionales
-    if (roles.length > 0) {
-      queryParams += `&roles=${roles.join(',')}`;
-    }
-    if (isActive !== null) {
-      queryParams += `&isActive=${isActive}`;
-    }
-    if (searchTerm) {
-      queryParams += `&searchTerm=${encodeURIComponent(searchTerm)}`;
-    }
-
-    return this.apiConfigService.get<ApiResponse<{
-      users: User[],
-      totalItems: number,
-      totalPages: number
-    }>>(`user/fetchUsers?${queryParams}`);
+  fetchUsers(queryParams: string): Observable<ApiResponse<UsersResponse>> {
+    return this.apiConfigService.get<ApiResponse<UsersResponse>>(`user/fetchUsers?${queryParams}`);
   }
 
   // Obtener todos los filtros
@@ -55,27 +22,22 @@ export class UsersService {
   }
 
   // Obtener usuario por ID
-  getUserById(id: number): Observable<ApiResponse<{ user: User }>> {
-    return this.apiConfigService.get<ApiResponse<{ user: User }>>(`user/getById/${id}`);
+  getUserById(id: number): Observable<ApiResponse<UserResponse>> {
+    return this.apiConfigService.get<ApiResponse<UserResponse>>(`user/getById/${id}`);
   }
 
   // Crear un nuevo usuario
-  createUserWithRole<T extends Admin | Seller | Customer>(
-    userData: User,
-    roleData: T
-  ): Observable<ApiResponse<{ user: User; role: T }>> {
-    // La ruta es única para todos los roles
-    const endpoint = 'user/create';
-    const payload = { userData, roleData };
-    console.log('Datos enviados al servidor:', JSON.stringify({ userData, roleData }, null, 2));
-    return this.apiConfigService.post<ApiResponse<{ user: User; role: T }>>(
-      endpoint,
-      payload
-    );
+  createUserWithRole(userWithRole : UserWithRole): Observable<ApiResponse<any>> {
+    return this.apiConfigService.post<ApiResponse<any>>('user/create', userWithRole);
+  }
+
+  // Actualizar el estado de un usuario
+  updateUserStatus(id: number, status: boolean): Observable<ApiResponse<any>> {
+    return this.apiConfigService.put<ApiResponse<any>>(`user/${id}/status`, { "is_active": status });
   }
 
   // Actualizar un usuario
-  updateUser(id: number, userData: User): Observable<ApiResponse<any>> {
+  updateUser(id: number, userData: UserWithRole): Observable<ApiResponse<any>> {
     return this.apiConfigService.put<ApiResponse<any>>(`user/update/${id}`, userData);
   }
 

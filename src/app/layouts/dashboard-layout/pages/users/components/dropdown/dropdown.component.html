@@ -9,7 +9,7 @@
   class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
   <ul class="py-1 text-sm" [attr.aria-labelledby]="'dpt-' + id + '-dropdown-button'">
     <li>
-      <button type="button" data-modal-target="updateProductModal" data-modal-toggle="updateProductModal"
+      <button type="button" (click)="loadComponent('edit')" 
         class="flex w-full items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-gray-700 dark:text-gray-200">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -23,7 +23,7 @@
       </button>
     </li>
     <li>
-      <button type="button" data-modal-target="readProductModal" data-modal-toggle="readProductModal"
+      <button type="button" (click)="loadComponent('details')"
         class="flex w-full items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-gray-700 dark:text-gray-200">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -36,7 +36,7 @@
       </button>
     </li>
     <li>
-      <button type="button" data-modal-target="deleteModal" data-modal-toggle="deleteModal"
+      <button type="button" (click)="loadComponent('delete')" 
         class="flex w-full items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-500 dark:hover:text-red-400">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -53,7 +53,4 @@
     </li>
   </ul>
 </div>
-
-<app-users-upd/>
-<app-users-det/>
-<app-users-del/>
+<div #container></div>

@@ -204,4 +204,10 @@ export class UsersSelComponent implements OnInit {
 
     console.log(`Ordenando por: ${column}, Orden: ${this.sortOrder}`);
   }
+
+  getProcessedName(user: User): string {
+    const firstName = user.firstname.split(' ')[0]; // Tomar solo el primer nombre
+    const lastName = user.lastname; // Apellido completo
+    return `${firstName} ${lastName}`; // Concatenar con un espacio
+  }
 }

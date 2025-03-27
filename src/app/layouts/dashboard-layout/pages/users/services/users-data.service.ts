@@ -1,11 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { UsersService } from './users.service';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
-import { User } from '../../../../../models/user.model';
+import { BehaviorSubject, catchError, map, Observable, of, startWith, Subject } from 'rxjs';
+import { User, UserResponse, UserWithRole } from '../../../../../models/user.model';
 import { Filters, SelectedFilters } from '../../../../../models/user-filter.model';
-import { Admin } from '../../../../../models/admin.model';
-import { Customer } from '../../../../../models/customer.model';
-import { Seller } from '../../../../../models/seller.model';
 import { ApiError, ApiResponse, ProcessStatus } from '../../../../../models/response.model';
 
 @Injectable({
@@ -15,35 +12,73 @@ import { ApiError, ApiResponse, ProcessStatus } from '../../../../../models/resp
 export class UsersDataService {
   private userService = inject(UsersService);
 
-  // Estado interno de datos
+  /**
+   * Subjects y Observables para la gestión de usuarios.
+   */
+
+  // Lista de usuarios cargados
   private usersSubject = new BehaviorSubject<User[]>([]);
-  private errorUsersSubject = new BehaviorSubject<string | null>(null);
-  private userCreateStatusSubject = new Subject<ProcessStatus>();
-  private userUpdateStatusSubject = new Subject<ProcessStatus>();
-  private userDeleteStatusSubject = new Subject<ProcessStatus>();
-  private totalItemsSubject = new BehaviorSubject<number>(0);
-  private totalPagesSubject = new BehaviorSubject<number>(1);
-  private currentPageSubject = new BehaviorSubject<number>(1);
-  private pageSizeSubject = new BehaviorSubject<number>(10);
-  private sortBySubject = new BehaviorSubject<string>('created_at');
-  private sortOrderSubject = new BehaviorSubject<'asc' | 'desc'>('desc');
-  private filtersSubject = new BehaviorSubject<Filters | null>(null);
-  private selectedFiltersSubject = new BehaviorSubject<SelectedFilters | null>(null);
-  // Observables públicos
   public users$ = this.usersSubject.asObservable();
+
+  // Error al cargar usuarios
+  private errorUsersSubject = new BehaviorSubject<string | null>(null);
   public errorUsers$ = this.errorUsersSubject.asObservable();
+
+  // Usuario seleccionado
+  private userSelectedSubject = new BehaviorSubject<UserWithRole | null>(null);
+  public userSelected$ = this.userSelectedSubject.asObservable();
+
+  // Estado de creación de usuario
+  private userCreateStatusSubject = new Subject<ProcessStatus>();
   public userCreateStatus$ = this.userCreateStatusSubject.asObservable();
+
+  // Estado de actualizacion del estado de un usuario
+  private userStatusUpdateSubject = new Subject<ProcessStatus>();
+  public userStatusUpdate$ = this.userStatusUpdateSubject.asObservable();
+
+  // Estado de actualización de usuario
+  private userUpdateStatusSubject = new Subject<ProcessStatus>();
   public userUpdateStatus$ = this.userUpdateStatusSubject.asObservable();
+
+  // Estado de eliminación de usuario
+  private userDeleteStatusSubject = new Subject<ProcessStatus>();
   public userDeleteStatus$ = this.userDeleteStatusSubject.asObservable();
+
+  // Total de usuarios disponibles
+  private totalItemsSubject = new BehaviorSubject<number>(0);
   public totalItems$ = this.totalItemsSubject.asObservable();
+
+  // Total de páginas
+  private totalPagesSubject = new BehaviorSubject<number>(1);
   public totalPages$ = this.totalPagesSubject.asObservable();
+
+  // Página actual
+  private currentPageSubject = new BehaviorSubject<number>(1);
   public currentPage$ = this.currentPageSubject.asObservable();
+
+  // Tamaño de página
+  private pageSizeSubject = new BehaviorSubject<number>(10);
   public pageSize$ = this.pageSizeSubject.asObservable();
+
+  // Ordenar por columna
+  private sortBySubject = new BehaviorSubject<string>('created_at');
   public sortBy$ = this.sortBySubject.asObservable();
+
+  // Dirección del orden
+  private sortOrderSubject = new BehaviorSubject<'asc' | 'desc'>('desc');
   public sortOrder$ = this.sortOrderSubject.asObservable();
+
+  // Filtros disponibles (roles, estados)
+  private filtersSubject = new BehaviorSubject<Filters | null>(null);
   public filters$ = this.filtersSubject.asObservable();
+
+  // Filtros aplicados actualmente
+  private selectedFiltersSubject = new BehaviorSubject<SelectedFilters | null>(null);
   public selectedFilters$ = this.selectedFiltersSubject.asObservable();
 
+  /**
+   * Obtener lista de usuarios con paginación y filtros.
+   */
   fetchUsers(
     currentPage: number = this.currentPageSubject.value,
     pageSize: number = this.pageSizeSubject.value,
@@ -52,10 +87,22 @@ export class UsersDataService {
     const roles = filters.roles || [];
     const isActive = filters.status !== undefined ? filters.status : null;
     const searchTerm = filters.searchTerm || null;
-    const sortBy = this.sortBySubject.value;
-    const sortOrder = this.sortOrderSubject.value;
+    const sortBy = this.sortBySubject.value || 'created_at';
+    const sortOrder = this.sortOrderSubject.value || 'desc';
 
-    this.userService.fetchUsers(currentPage, pageSize, roles, isActive, searchTerm, sortBy, sortOrder).subscribe({
+    let queryParams = `currentPage=${currentPage}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+
+    if (roles.length > 0) {
+      queryParams += `&roles=${roles.join(',')}`;
+    }
+    if (isActive !== null) {
+      queryParams += `&isActive=${isActive}`;
+    }
+    if (searchTerm) {
+      queryParams += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+    }
+
+    this.userService.fetchUsers(queryParams).subscribe({
       next: (response) => {
         const users = response.data?.users ?? [];
         const totalItems = response.data?.totalItems ?? 0;
@@ -68,24 +115,28 @@ export class UsersDataService {
       error: (err) => {
         const errorMsg = err?.message || 'Error al obtener los usuarios.';
         this.errorUsersSubject.next(errorMsg);
-        //console.error('Error en fetchUsers:', err);
       },
     });
   }
 
-  fetchFilters() {
+  /**
+   * Obtener filtros para rol y estado de usuario.
+   */
+  fetchFilters(): void {
     this.userService.getFilters().subscribe({
       next: (response) => {
         const filters: Filters = response.data?.filters || { roles: [], statuses: [] };
         this.filtersSubject.next(filters);
       },
       error: (err) => {
-        //console.error('Error al obtener filtros:', err);
         this.filtersSubject.next(null);
       }
     });
   }
 
+  /**
+   * Aplicar filtros seleccionados para tener la nueva lista de usuarios.
+   */
   applySelectedFilters(filters: SelectedFilters) {
     const combinedFilters = { ...this.selectedFiltersSubject.value, ...filters };
     this.selectedFiltersSubject.next(combinedFilters);
@@ -93,6 +144,9 @@ export class UsersDataService {
     this.fetchUsers(1, this.pageSizeSubject.value, combinedFilters);
   }
 
+  /**
+   * Resetear filtros a sus valores predeterminados.
+   */
   resetFilters(): void {
     const defaultFilters: SelectedFilters = {};
     this.selectedFiltersSubject.next(defaultFilters);
@@ -103,11 +157,17 @@ export class UsersDataService {
     this.fetchUsers(1, 10, {});
   }
 
+  /**
+   * Configurar la página actual.
+   */
   setCurrentPage(page: number): void {
     this.currentPageSubject.next(page);
     this.fetchUsers(page, this.pageSizeSubject.value, this.selectedFiltersSubject.value || {});
   }
 
+  /**
+   * Configurar el orden de los resultados.
+   */
   setSortOrder(sortBy: string, sortOrder: 'asc' | 'desc') {
     this.sortBySubject.next(sortBy);
     this.sortOrderSubject.next(sortOrder);
@@ -119,25 +179,12 @@ export class UsersDataService {
     );
   }
 
-  // Obtener usuario por ID
-  getUserById(id: number): Observable<User> {
-    return this.userService.getUserById(id).pipe(
-      map(response => {
-        if (!response.data?.user) {
-          throw new Error('User no encontrado');
-        }
-        return response.data.user;
-      }),
-      //catchError(this.handleError.bind(this))
-    );
-  }
-
-  // Crear un nuevo usuario
-  createUser<T extends Admin | Seller | Customer>(
-    userData: User,
-    roleData: T
-  ): void {
-    this.userService.createUserWithRole(userData, roleData).subscribe({
+  /**
+   * Crear un nuevo usuario.
+   */
+  createUser(userWithRole: UserWithRole): void {
+    this.userCreateStatusSubject.next({ status: 'loading', message: 'Creando usuario...' });
+    this.userService.createUserWithRole(userWithRole).subscribe({
       next: () => {
         this.userCreateStatusSubject.next({
           status: 'success',
@@ -147,18 +194,17 @@ export class UsersDataService {
       },
       error: (error) => {
         console.error('🛑 Error recibido de la API:', JSON.stringify(error, null, 2));
-        const statusCode = error.status; // Obtén el código de estado HTTP
+        const statusCode = error.status;
         let errorMsg = 'Error al crear el usuario.';
         let fieldErrors: ApiError[] | undefined;
         const apiError = error.error;
 
-        // Personaliza el mensaje de error según el código de estado
         if (statusCode === 0) {
           errorMsg = 'No se pudo conectar al servidor. Verifique su conexión a Internet.';
-        } else if (statusCode === 400 && apiError?.errors) { 
+        } else if (statusCode === 400 && apiError?.errors) {
           errorMsg = apiError.message || 'Errores en la creación del usuario';
           fieldErrors = apiError.errors;
-        } else if (statusCode === 409 && apiError?.errors) { 
+        } else if (statusCode === 409 && apiError?.errors) {
           errorMsg = apiError.message || 'Conflicto: algunos datos ya están registrados.';
           fieldErrors = apiError.errors;
         } else if (statusCode >= 500) {
@@ -167,7 +213,6 @@ export class UsersDataService {
           errorMsg = apiError?.message || 'Error en la solicitud. Verifique los datos enviados.';
         }
 
-        // Envía el código de estado y el mensaje de error al Subject
         this.userCreateStatusSubject.next({
           status: 'error',
           message: errorMsg,
@@ -178,15 +223,135 @@ export class UsersDataService {
     });
   }
 
+  /**
+   * Resetear el estado de creación de usuario. - Pendiente Toast
+   */
   resetUserCreateStatus(): void {
-    this.userCreateStatusSubject.next({ status: 'idle', message: ''});
+    this.userCreateStatusSubject.next({ status: 'idle', message: '' });
   }
 
-  // Actualizar un usuario
-  updateUser(id: number, userData: User): Observable<void> {
-    return this.userService.updateUser(id, userData).pipe(
-      map(() => { }),
-      //catchError(this.handleError.bind(this))
+  /**
+   * Obtener un usuario por su ID, reutilizando datos si ya están cargados.
+   */
+  getUserById(id: number): Observable<UserWithRole> {
+    const cachedUser = this.userSelectedSubject.value;
+
+    if (cachedUser && cachedUser.userData.id === id) {
+      // Si el usuario ya está cargado, retornamos un observable con los datos existentes
+      return new Observable(observer => {
+        observer.next(cachedUser);
+        observer.complete();
+      });
+    }
+
+    // Si no está cargado, hacemos la petición y actualizamos el estado
+    return this.userService.getUserById(id).pipe(
+      map(response => {
+        if (!response.data?.user) {
+          throw new Error('Usuario no encontrado');
+        }
+
+        const userResponse: UserResponse = response.data;
+        const userWithRole: UserWithRole = {
+          userData: userResponse.user.userData, // Asegurar que sea el dato correcto
+          roleData: userResponse.user.roleData // Asegurar que tenga el rol
+        };
+
+        this.userSelectedSubject.next(userWithRole);
+
+        return userWithRole;
+      })
     );
   }
+
+  /**
+   * Actualizar un usuario
+   */
+  updateUser(id: number, userData: UserWithRole): void {
+    this.userUpdateStatusSubject.next({ status: 'loading', message: 'Creando usuario...' });
+    this.userService.updateUser(id,userData).subscribe({
+      next: () => {
+        this.userUpdateStatusSubject.next({
+          status: 'success',
+          message: 'Usuario actualizado con éxito',
+        });
+        this.userSelectedSubject.next(null);
+        this.resetFilters();
+      },
+      error: (error) => {
+        const statusCode = error.status;
+        let errorMsg = 'Error al crear el usuario.';
+        let fieldErrors: ApiError[] | undefined;
+        const apiError = error.error;
+
+        if (statusCode === 0) {
+          errorMsg = 'No se pudo conectar al servidor. Verifique su conexión a Internet.';
+        } else if (statusCode === 400 && apiError?.errors) {
+          errorMsg = apiError.message || 'Errores en la creación del usuario';
+          fieldErrors = apiError.errors;
+        } else if (statusCode === 409 && apiError?.errors) {
+          errorMsg = apiError.message || 'Conflicto: algunos datos ya están registrados.';
+          fieldErrors = apiError.errors;
+        } else if (statusCode >= 500) {
+          errorMsg = 'Error del servidor. Intente nuevamente más tarde.';
+        } else if (statusCode >= 400 && statusCode < 500) {
+          errorMsg = apiError?.message || 'Error en la solicitud. Verifique los datos enviados.';
+        }
+
+        this.userUpdateStatusSubject.next({
+          status: 'error',
+          message: errorMsg,
+          statusCode,
+          errors: fieldErrors,
+        });
+      }
+    });
+  }
+
+  // Actualizar el estado de un usuario
+  updateUserStatus(id: number, status: boolean): Observable<ProcessStatus> {
+    this.userStatusUpdateSubject.next({ status: 'loading', message: 'Actualizando estado...' });
+    return this.userService.updateUserStatus(id, status).pipe(
+      map(() => {
+        const successResponse: ProcessStatus = {
+          status: 'success',
+          message: 'Estado actualizado con éxito',
+        };
+        this.userStatusUpdateSubject.next(successResponse);
+        return successResponse;
+      }),
+      catchError((error) => {
+        console.error('Error en actualización de estado:', error);
+
+        const errorResponse: ProcessStatus = {
+          status: 'error',
+          message: error.error?.message || 'Error al actualizar el estado',
+          statusCode: error.status,
+          errors: error.error?.errors || [],
+        };
+        this.userStatusUpdateSubject.next(errorResponse);
+        return of(errorResponse);
+      })
+    );
+  }
+
+  // Eliminar un usuario
+  deleteUser(id: number): Observable<ProcessStatus> {
+    return this.userService.deleteUser(id).pipe(
+      startWith<ProcessStatus>({ status: 'loading', message: 'Eliminando usuario...' }), 
+      map(() => ({
+        status: 'success',
+        message: 'Usuario eliminado con éxito'
+      } as ProcessStatus)), 
+      catchError((error) =>
+        of({
+          status: 'error',
+          message: error.error?.message || 'Error al eliminar el usuario',
+          statusCode: error.status,
+          errors: error.error?.errors || []
+        } as ProcessStatus) 
+      )
+    );
+  }
+  
 }
