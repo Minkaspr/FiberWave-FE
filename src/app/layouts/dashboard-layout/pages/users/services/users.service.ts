@@ -55,4 +55,9 @@ export class UsersService {
   deleteUser(id: number): Observable<ApiResponse<any>> {
     return this.apiConfigService.delete<ApiResponse<any>>(`user/delete/${id}`);
   }
+
+  // Eliminar usuarios
+  deleteMultipleUsers(payload: any): Observable<any> {
+    return this.apiConfigService.deleteWithBody('user/delete-multiple', payload);
+  }
 }

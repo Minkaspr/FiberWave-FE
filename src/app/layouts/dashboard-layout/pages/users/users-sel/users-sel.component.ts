@@ -1,7 +1,6 @@
-import { AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { UsersDataService } from '../services/users-data.service';
 import { User } from '../../../../../models/user.model';
-import { initFlowbite } from 'flowbite';
 import { CommonModule, DatePipe } from '@angular/common';
 import { DropdownComponent } from "../components/dropdown/dropdown.component";
 
@@ -17,6 +16,7 @@ import { DropdownComponent } from "../components/dropdown/dropdown.component";
 export class UsersSelComponent implements OnInit {
 
   @ViewChild('tableContainer') tableContainer!: ElementRef;
+  @Output() selectedUsersChanged = new EventEmitter<number[]>();
 
   users: User[] = [];
   totalItems: number = 0;
@@ -29,6 +29,9 @@ export class UsersSelComponent implements OnInit {
   sortedColumn: string = '';
   sortOrder: 'asc' | 'desc' = 'asc'; // Orden inicial
 
+  selectedUsersByPage: { [page: number]: Set<number> } = {}; // Objeto para almacenar IDs por página
+  selectAllByPage: { [page: number]: boolean } = {}; // Para el checkbox "Seleccionar todos"
+
   constructor(
     private usersDataService: UsersDataService,
     private datePipe: DatePipe,
@@ -38,6 +41,9 @@ export class UsersSelComponent implements OnInit {
   ngOnInit(): void {
     this.usersDataService.fetchUsers();
     this.subscribeToDataUpdates();
+    this.usersDataService.clearSelection$.subscribe(() => {
+      this.clearSelection(); // 👈 Método que borra la selección
+    });
   }
 
   // Método para subscribirse a las actualizaciones de datos de paginación
@@ -45,6 +51,7 @@ export class UsersSelComponent implements OnInit {
     this.usersDataService.users$.subscribe({
       next: (data) => {
         this.users = this.transformUserDates(data); 
+        this.checkIfAllSelected();
         this.cdRef.detectChanges();
         console.log('Usuarios actualizados:', this.users);
       },
@@ -209,5 +216,80 @@ export class UsersSelComponent implements OnInit {
     const firstName = user.firstname.split(' ')[0]; // Tomar solo el primer nombre
     const lastName = user.lastname; // Apellido completo
     return `${firstName} ${lastName}`; // Concatenar con un espacio
+  }
+
+  private notifyParent() {
+    // Obtenemos TODOS los IDs seleccionados en TODAS las páginas
+    const allSelectedIds = Object.values(this.selectedUsersByPage)
+      .flatMap(set => Array.from(set));
+
+    // Emitimos al padre
+    this.selectedUsersChanged.emit(allSelectedIds);
+  }
+
+  // Seleccionar/Deseleccionar todos los usuarios
+  toggleSelectAll() {
+    const currentPage = this.currentPage;
+  
+    if (!this.selectedUsersByPage[currentPage]) {
+      this.selectedUsersByPage[currentPage] = new Set();
+    }
+  
+    const allSelected = this.users.every(user => this.selectedUsersByPage[currentPage].has(user.id!));
+  
+    if (allSelected) {
+      this.selectedUsersByPage[currentPage].clear();
+      this.selectAllByPage[currentPage] = false;
+    } else {
+      this.selectedUsersByPage[currentPage] = new Set(this.users.map(user => user.id!));
+      this.selectAllByPage[currentPage] = true;
+    }
+    this.notifyParent();
+  }
+  
+  updateSelectAllStatus() {
+    const currentPage = this.currentPage;
+    const selectedUsers = this.selectedUsersByPage[currentPage] || new Set();
+  
+    this.selectAllByPage[currentPage] = this.users.every(user => selectedUsers.has(user.id!));
+  }
+  
+
+  // Seleccionar/Deseleccionar un usuario individual
+  toggleUserSelection(userId: number) {
+    const currentPage = this.currentPage;
+  
+    if (!this.selectedUsersByPage[currentPage]) {
+      this.selectedUsersByPage[currentPage] = new Set();
+    }
+  
+    if (this.selectedUsersByPage[currentPage].has(userId)) {
+      this.selectedUsersByPage[currentPage].delete(userId);
+    } else {
+      this.selectedUsersByPage[currentPage].add(userId);
+    }
+  
+    this.updateSelectAllStatus();
+    this.notifyParent();
+  }
+
+  // Verificar si todos los usuarios están seleccionados
+  private checkIfAllSelected(): void {
+    const currentPage = this.currentPage;
+    const selectedUsers = this.selectedUsersByPage[currentPage] || new Set();
+    
+    this.selectAllByPage[currentPage] = this.users.every(user => selectedUsers.has(user.id!));
+  }
+  
+  // Método para verificar si un usuario está seleccionado
+  isUserSelected(userId: number): boolean {
+    const currentPage = this.currentPage;
+    return this.selectedUsersByPage[currentPage]?.has(userId) || false;
+  }
+
+  clearSelection(): void {
+    this.selectedUsersByPage = {};
+    this.selectAllByPage = {};
+    this.selectedUsersChanged.emit([]);
   }
 }

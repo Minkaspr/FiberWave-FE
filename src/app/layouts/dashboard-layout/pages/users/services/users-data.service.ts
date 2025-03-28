@@ -76,6 +76,10 @@ export class UsersDataService {
   private selectedFiltersSubject = new BehaviorSubject<SelectedFilters | null>(null);
   public selectedFilters$ = this.selectedFiltersSubject.asObservable();
 
+  // Limpiar los usuarios seleccionados
+  private clearSelectionSubject = new Subject<void>(); 
+  clearSelection$ = this.clearSelectionSubject.asObservable();
+
   /**
    * Obtener lista de usuarios con paginación y filtros.
    */
@@ -353,5 +357,30 @@ export class UsersDataService {
       )
     );
   }
+
+  // Eliminar usuarios
+  deleteMultipleUsers(payload: any): Observable<ProcessStatus> {
+    return this.userService.deleteMultipleUsers(payload).pipe(
+      startWith<ProcessStatus>({
+        status: 'loading',
+        message: `Eliminando ${payload.userIds.length} usuario(s)...`
+      }),
+      map(() => ({
+        status: 'success',
+        message: `${payload.userIds.length} usuario(s) eliminado(s) con éxito`
+      } as ProcessStatus)),
+      catchError((error) =>
+        of({
+          status: 'error',
+          message: error.error?.message || 'Error al eliminar los usuarios',
+          statusCode: error.status,
+          errors: error.error?.errors || []
+        } as ProcessStatus)
+      )
+    );
+  }
   
+  triggerClearSelection() {
+    this.clearSelectionSubject.next(); 
+  }
 }

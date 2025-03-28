@@ -30,4 +30,8 @@ export class ApiConfigService {
   delete<T>(endpoint: string, params?: HttpParams): Observable<T> { 
     return this._http.delete<T>(`${this.urlBase}/${endpoint}`, { params }); 
   }
+
+  deleteWithBody<T>(endpoint: string, data: any, headers?: HttpHeaders): Observable<T> { 
+    return this._http.request<T>('DELETE', `${this.urlBase}/${endpoint}`, { body: data, headers });
+  }
 }
